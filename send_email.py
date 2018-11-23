@@ -10,25 +10,32 @@ from utils import parse_argument, get_config, send_email
 config = get_config()
 
 def get_html_table(jsonData):
-	jsonData = jsonData['query_result']['data']['rows']
-	jsonData = jsonData[:10]
-	template = "<html><body><table cellpadding=10 border=1></table></body></html>"
-	soup = bs4.BeautifulSoup(template)
-	header_data = jsonData[1].keys()
-	table_header_row = bs4.BeautifulSoup('<thead><tr></tr></thead>')
-	for header_col in header_data:
-		table_header_data = bs4.BeautifulSoup('<th bgcolor=#dddddd>' + header_col + '</th>')
-		table_header_row.tr.append(table_header_data)
-	soup.body.table.append(table_header_row)
-	template = str(soup)
-	return template
+  jsonData = jsonData['query_result']['data']['rows']
+  jsonData = jsonData[:10]
+  template = "<html><body><table cellpadding=10 border=1></table></body></html>"
+  soup = bs4.BeautifulSoup(template)
+  header_data = jsonData[1].keys()
+  table_header_row = bs4.BeautifulSoup('<thead><tr></tr></thead>')
+  for header_col in header_data:
+    table_header_data = bs4.BeautifulSoup('<th bgcolor=#dddddd>' + header_col + '</th>')
+    table_header_row.tr.append(table_header_data)
+  soup.body.table.append(table_header_row)
+  for row in jsonData:
+    table_row = bs4.BeautifulSoup('<tr></tr>')
+    for header in header_data:
+      table_row_data = bs4.BeautifulSoup('<td>' + str(row[header]) + '</td>')
+      table_row.append(table_row_data)
+    soup.body.table.append(table_row)
+  
+  template = str(soup)
+  return template
 
 def get_query_details(query_id):
   query_url = redash_query_url + query_id
   query_details = requests.get(query_url, 
     params={'api_key': query_key}).json()
   return query_details
-	
+  
 def get_query_results(query_id):
   query_url = redash_query_url + query_id + "/results.json"
   query_results = requests.get(query_url, 

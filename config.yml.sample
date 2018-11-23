@@ -1,8 +1,8 @@
 smtp:
-	host: localhost
-	port: 25
-	login: root
-	password: password
+  host: localhost
+  port: 25
+  login: test
+  password: password
 redash:
-	query_url: http://localhost:25
-	user_api_key: asdfasdfaadfasdf
+  query_url: http://localhost/api/queries/
+  user_api_key: asdasfasfasdas
