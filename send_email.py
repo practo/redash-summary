@@ -5,7 +5,7 @@ import requests
 from json2html import *
 import json
 import bs4
-from utils import parse_argument, get_config
+from utils import parse_argument, get_config, send_email
 
 config = get_config()
 
@@ -26,10 +26,10 @@ def get_html_table(jsonData):
 def get_query_details(query_id):
   query_url = redash_query_url + query_id
   query_details = requests.get(query_url, 
-        params={'api_key': query_key}).json()
-	return query_details
+    params={'api_key': query_key}).json()
+  return query_details
 	
-def get_query_results():
+def get_query_results(query_id):
   query_url = redash_query_url + query_id + "/results.json"
   query_results = requests.get(query_url, 
         params={'api_key': query_key}).json()
@@ -41,24 +41,9 @@ def put_query_refresh():
 
 def send_email_alert(query_details, query_result, recepient_emails):
     message = get_html_table(query_result)
-    request_url = 'https://api.mailgun.net/v3/<staging>/messages'
-    response = requests.post(request_url, auth=('api', 'key'), data={
-        'from': 'noreply@redash.practo.com',
-        'to': recepient_emails,
-        'subject': query_details.name,
-        'html': message
-    })
-    # print response
+    send_email(recepient_emails, query_details['name'], message)
 
 options = parse_argument()
 query_details = get_query_details(options.query_id)
 query_result = get_query_results(options.query_id)
 send_email_alert(query_details, query_result, options.recepient_emails)
-
-
-
-
-
-
-
-

@@ -2,7 +2,10 @@
 
 import yaml
 import os
-
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+import optparse
 
 def __get_comma_separated_args(option, opt, value, parser):
     setattr(parser.values, option.dest, value.split(','))
@@ -34,7 +37,25 @@ def get_config():
         try:
             config = yaml.load(conf_yaml)
         except yaml.YAMLError, err:
-            logger.error(err, exc_info=True)
+            print err
             raise
 
     return config
+
+def send_email(recipients, subject, html_data):
+    config = get_config()
+    smpt_config = config['smtp']
+    print smpt_config
+    server = smtplib.SMTP(smpt_config['host'], smpt_config['port'])
+    server.ehlo()
+    server.starttls()
+    server.login(smpt_config['login'], smpt_config['password'])
+    from_address = 'noreply@redash.practo.com'
+    for recipient in recipients:
+        msg = MIMEMultipart()
+        msg['Subject'] = 'Redash:' + subject
+        msg['From'] = from_address
+        msg['To'] = recipient
+        msg.attach(MIMEText(html_data, 'html'))
+        server.sendmail(from_address, recipient, msg.as_string())
+    server.quit()
