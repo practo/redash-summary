@@ -1,0 +1,8 @@
+smtp:
+	host: localhost
+	port: 25
+	login: root
+	password: password
+redash:
+	query_url: http://localhost:25
+	user_api_key: asdfasdfaadfasdf

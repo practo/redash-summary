@@ -5,6 +5,9 @@ import requests
 from json2html import *
 import json
 import bs4
+from utils import parse_argument, get_config
+
+config = get_config()
 
 def get_html_table(jsonData):
 	jsonData = jsonData['query_result']['data']['rows']
@@ -20,40 +23,29 @@ def get_html_table(jsonData):
 	template = str(soup)
 	return template
 
-def __get_comma_separated_args(option, opt, value, parser):
-    setattr(parser.values, option.dest, value.split(','))
-
-def parse_argument():
-	parser = optparse.OptionParser()
-    parser.add_option('-q', '--query',
-                      dest="query_id",
-                      default="",
-                      type="string",
-                      )
-    parser.add_option('-e', '--email',
-                      type='string',
-                      action='callback',
-                      callback=__get_comma_separated_args,
-                      dest="recepient_emails",
-                      default=[],
-                      )
-    options, remainder = parser.parse_args()
-
-    return options
-
 def get_query_details(query_id):
-	return {}
+  query_url = redash_query_url + query_id
+  query_details = requests.get(query_url, 
+        params={'api_key': query_key}).json()
+	return query_details
 	
 def get_query_results():
-	return {}
+  query_url = redash_query_url + query_id + "/results.json"
+  query_results = requests.get(query_url, 
+        params={'api_key': query_key}).json()
+  return query_results
+
+# function to put the refresh query logic
+def put_query_refresh():
+  pass
 
 def send_email_alert(query_details, query_result, recepient_emails):
     message = get_html_table(query_result)
     request_url = 'https://api.mailgun.net/v3/<staging>/messages'
     response = requests.post(request_url, auth=('api', 'key'), data={
         'from': 'noreply@redash.practo.com',
-        'to': 'sandeep.pandey@practo.com',
-        'subject': 'Redash data veirfy',
+        'to': recepient_emails,
+        'subject': query_details.name,
         'html': message
     })
     # print response
