@@ -8,36 +8,38 @@ import bs4
 from utils import parse_argument, get_config, send_email
 
 config = get_config()
-
-def get_html_table(jsonData):
+redash_config = config['redash']
+def get_html_table(jsonData, query_id):
   jsonData = jsonData['query_result']['data']['rows']
   jsonData = jsonData[:10]
+  redash_url = redash_config['redash_query_url'] + query_id
   template = "<html><body><table cellpadding=10 border=1></table></body></html>"
-  soup = bs4.BeautifulSoup(template)
+  soup = bs4.BeautifulSoup(template, 'html.parser')
   header_data = jsonData[1].keys()
-  table_header_row = bs4.BeautifulSoup('<thead><tr></tr></thead>')
+  table_header_row = bs4.BeautifulSoup('<thead><tr></tr></thead>', 'html.parser')
   for header_col in header_data:
-    table_header_data = bs4.BeautifulSoup('<th bgcolor=#dddddd>' + header_col + '</th>')
+    table_header_data = bs4.BeautifulSoup('<th bgcolor=#dddddd>' + header_col + '</th>', 'html.parser')
     table_header_row.tr.append(table_header_data)
   soup.body.table.append(table_header_row)
   for row in jsonData:
-    table_row = bs4.BeautifulSoup('<tr></tr>')
+    table_row = bs4.BeautifulSoup('<tr></tr>', 'html.parser')
     for header in header_data:
-      table_row_data = bs4.BeautifulSoup('<td>' + str(row[header]) + '</td>')
+      table_row_data = bs4.BeautifulSoup('<td>' + str(row[header]) + '</td>', 'html.parser')
       table_row.append(table_row_data)
     soup.body.table.append(table_row)
-  
+  table_url_link = bs4.BeautifulSoup("<a href="+ redash_url + ">View more on redash</a>", 'html.parser')
+  soup.body.append(table_url_link)
   template = str(soup)
   return template
 
 def get_query_details(query_id):
-  query_url = redash_query_url + query_id
+  query_url = redash_config['query_url'] + query_id
   query_details = requests.get(query_url, 
     params={'api_key': query_key}).json()
   return query_details
   
 def get_query_results(query_id):
-  query_url = redash_query_url + query_id + "/results.json"
+  query_url = redash_config['query_url'] + query_id + "/results.json"
   query_results = requests.get(query_url, 
         params={'api_key': query_key}).json()
   return query_results
@@ -46,11 +48,12 @@ def get_query_results(query_id):
 def put_query_refresh():
   pass
 
-def send_email_alert(query_details, query_result, recepient_emails):
-    message = get_html_table(query_result)
+def send_email_alert(query_details, query_result, recepient_emails, query_id):
+    message = get_html_table(query_result, query_id)
     send_email(recepient_emails, query_details['name'], message)
 
 options = parse_argument()
 query_details = get_query_details(options.query_id)
 query_result = get_query_results(options.query_id)
-send_email_alert(query_details, query_result, options.recepient_emails)
+send_email_alert(query_details, query_result, 
+  options.recepient_emails, options.query_id)

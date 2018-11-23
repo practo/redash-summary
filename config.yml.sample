@@ -6,3 +6,4 @@ smtp:
 redash:
   query_url: http://localhost/api/queries/
   user_api_key: asdasfasfasdas
+  redash_query_url: http://localhost/queries/

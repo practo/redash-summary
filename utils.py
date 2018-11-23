@@ -45,7 +45,6 @@ def get_config():
 def send_email(recipients, subject, html_data):
     config = get_config()
     smpt_config = config['smtp']
-    print smpt_config
     server = smtplib.SMTP(smpt_config['host'], smpt_config['port'])
     server.ehlo()
     server.starttls()
