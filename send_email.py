@@ -15,7 +15,10 @@ def get_html_table(jsonData, query_id):
   redash_url = redash_config['redash_query_url'] + query_id
   template = "<html><body><table cellpadding=10 border=1></table></body></html>"
   soup = bs4.BeautifulSoup(template, 'html.parser')
-  header_data = jsonData[1].keys()
+  if len(jsonData) > 0:
+    header_data = jsonData[0].keys()
+  else:
+    return str(soup)
   table_header_row = bs4.BeautifulSoup('<thead><tr></tr></thead>', 'html.parser')
   for header_col in header_data:
     table_header_data = bs4.BeautifulSoup('<th bgcolor=#dddddd>' + header_col + '</th>', 'html.parser')
@@ -35,13 +38,13 @@ def get_html_table(jsonData, query_id):
 def get_query_details(query_id):
   query_url = redash_config['query_url'] + query_id
   query_details = requests.get(query_url, 
-    params={'api_key': query_key}).json()
+    params={'api_key': redash_config['user_api_key']}).json()
   return query_details
   
 def get_query_results(query_id):
   query_url = redash_config['query_url'] + query_id + "/results.json"
   query_results = requests.get(query_url, 
-        params={'api_key': query_key}).json()
+        params={'api_key': redash_config['user_api_key']}).json()
   return query_results
 
 # function to put the refresh query logic
