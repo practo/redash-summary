@@ -35,7 +35,7 @@ def send_slack_alert(query_details, query_result,channel,query_id):
 	pandadata = pd.DataFrame(jsonData, columns=header_data);
 	message_text = "*"+query_details['name'] + "* \n" \
 					+ "```"+pandadata.to_string(index=False)+"```"
-	message_text = message_text + "\n click "  \
+	message_text = message_text + "\n query url: "  \
 					+ redash_config['redash_query_url'] + str(query_id)
 	sc.api_call(
 	  "chat.postMessage",
