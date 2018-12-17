@@ -26,7 +26,6 @@ def parse_argument():
                       )
     parser.add_option('-c', '--channel',
                       type='string',
-                      action='callback',
                       dest="channel",
                       default=[],
                       )

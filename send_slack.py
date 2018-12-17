@@ -3,6 +3,7 @@ from slackclient import SlackClient
 from utils import parse_argument, get_config, send_email
 import bs4
 import pandas as pd
+import requests
 
 config = get_config()
 redash_config = config['redash']
@@ -29,15 +30,16 @@ def put_query_refresh():
 def send_slack_alert(query_details, query_result,channel,query_id):
 	# message = get_html_table(query_result, query_id)
 	jsonData = query_result['query_result']['data']['rows'];
+	jsonData = jsonData[:10]
 	header_data = jsonData[0].keys()
 	pandadata = pd.DataFrame(jsonData, columns=header_data);
 	message_text = "*"+query_details['name'] + "* \n" \
 					+ "```"+pandadata.to_string(index=False)+"```"
-	message_text = message_text + "\n "  \
+	message_text = message_text + "\n click "  \
 					+ redash_config['redash_query_url'] + str(query_id)
 	sc.api_call(
 	  "chat.postMessage",
-	  channel="CET024BAP",
+	  channel=channel,
 	  text= message_text,
 	  mrkdwn=True
 	)
