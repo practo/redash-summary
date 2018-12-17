@@ -24,6 +24,13 @@ def parse_argument():
                       dest="recepient_emails",
                       default=[],
                       )
+    parser.add_option('-c', '--channel',
+                      type='string',
+                      action='callback',
+                      dest="channel",
+                      default=[],
+                      )
+
     options, remainder = parser.parse_args()
 
     return options
