@@ -70,7 +70,7 @@ options = parse_argument()
 query_details = get_query_details(options.query_id)
 query_result = get_query_results(options.query_id)
 temp_file_name = None
-if options.send_dump:
+if options.send_dump == 'Y':
   temp_file_name = get_csv_dump(options.query_id)
 send_email_alert(query_details, query_result, 
   options.recepient_emails, options.query_id, temp_file_name)

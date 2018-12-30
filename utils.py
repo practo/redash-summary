@@ -33,7 +33,7 @@ def parse_argument():
     parser.add_option('-D', '--dump',
                       type='string',
                       dest='send_dump',
-                      default='No')
+                      default='N')
     options, remainder = parser.parse_args()
 
     return options
@@ -60,14 +60,15 @@ def send_email(recipients, subject, html_data, file_name=None):
     server.starttls()
     server.login(smpt_config['login'], smpt_config['password'])
     from_address = 'noreply@redash.practo.com'
+    msg = MIMEMultipart()
     if file_name:
       fp = open(file_name)
-      attachment = MIMEText(fp.read(), _subtype=subtype)
+      attachment = MIMEText(fp.read(), _subtype='plain')
       fp.close()
+      os.remove(file_name)
       attachment.add_header("Content-Disposition", "attachment", filename=file_name)
       msg.attach(attachment)
     for recipient in recipients:
-        msg = MIMEMultipart()
         msg['Subject'] = 'Redash:' + subject
         msg['From'] = from_address
         msg['To'] = recipient
