@@ -52,7 +52,7 @@ def get_query_results(query_id):
 def put_query_refresh():
   pass
 
-def send_query_dump(query_id):
+def get_csv_dump(query_id):
   with requests.Session() as s:
     CSV_URL = redash_config['query_url'] + query_id + "/results.csv"
     download = s.get(CSV_URL,
