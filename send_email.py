@@ -6,6 +6,7 @@ from json2html import *
 import json
 import bs4
 from utils import parse_argument, get_config, send_email
+import csv
 
 config = get_config()
 redash_config = config['redash']
@@ -51,12 +52,25 @@ def get_query_results(query_id):
 def put_query_refresh():
   pass
 
-def send_email_alert(query_details, query_result, recepient_emails, query_id):
-    message = get_html_table(query_result, query_id)
-    send_email(recepient_emails, query_details['name'], message)
+def send_query_dump(query_id):
+  with requests.Session() as s:
+    CSV_URL = redash_config['query_url'] + query_id + "/results.csv"
+    download = s.get(CSV_URL,
+      params={'api_key': redash_config['user_api_key']})
+    temp_file_name = query_id + '_results.csv'
+    with open(temp_file_name, 'w') as temp_file:
+      temp_file.writelines(download.content)
+    return temp_file_name
+
+def send_email_alert(query_details, query_result, recepient_emails, query_id, file_name):
+  message = get_html_table(query_result, query_id)
+  send_email(recepient_emails, query_details['name'], message, file_name)
 
 options = parse_argument()
 query_details = get_query_details(options.query_id)
 query_result = get_query_results(options.query_id)
+temp_file_name = None
+if options.send_dump:
+  temp_file_name = get_csv_dump(options.query_id)
 send_email_alert(query_details, query_result, 
-  options.recepient_emails, options.query_id)
+  options.recepient_emails, options.query_id, temp_file_name)
