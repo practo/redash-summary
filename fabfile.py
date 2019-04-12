@@ -29,18 +29,6 @@ def code_analyzer():
         "xargs -0 pyflakes"
     )
 
-
-@sniff(severity='major', timing='fast')
-def yaml_analyzer():
-    """Running yaml analyzer"""
-    info('Running yaml analyzer...')
-    return local(
-        "git ls-files -z | "
-        "grep -z '\.yml$' | "
-        "xargs -0 yamllint -d relaxed"
-    )
-
-
 @sniff(severity='major', timing='fast')
 def remove_debug_info():
     """Check and remove debugging print statements"""
@@ -55,20 +43,6 @@ def remove_debug_info():
         "xargs -0 grep -Pn \'(?<![Bb]lue|>>> )print\' | "
         "grep -v NOCHECK"
     )
-
-
-@sniff(severity='major', timing='fast')
-def find_kill_log_in_rdsconfig():
-    """Find kill log in RDS config"""
-    info('Finding kill_log in RDS config...')
-    return local("! git grep -Pin 'kill_log|Command' -- rdsconfig/")
-
-
-@sniff(severity='major', timing='fast')
-def check_newline_for_cron():
-    """Check newline for cron"""
-    info('Checking for newline in cron file...')
-    return local("tail -c 1 etc/cron.d/core_crons | hd | grep 0a >/dev/null")
 
 
 if __name__ == "__main__":
