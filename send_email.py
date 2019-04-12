@@ -2,11 +2,8 @@
 # This will send only top 10 data points 
 
 import requests
-from json2html import *
-import json
 import bs4
 from utils import parse_argument, get_config, send_email
-import csv
 
 config = get_config()
 redash_config = config['redash']

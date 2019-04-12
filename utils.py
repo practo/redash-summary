@@ -41,13 +41,12 @@ def parse_argument():
 def get_config():
     config_file_path = "./config.yml"
     if not os.path.exists(config_file_path):
-        logger.error("Missing Configuration File " + config_file_path)
         raise Exception("Missing Configuration File " + config_file_path)
     with open(config_file_path, "r") as conf_yaml:
         try:
             config = yaml.load(conf_yaml)
         except yaml.YAMLError, err:
-            print err
+            raise Exception(err)
             raise
 
     return config
