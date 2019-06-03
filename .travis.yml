@@ -1,3 +1,4 @@
+---
 language: python
 python:
   - "2.7"
@@ -6,5 +7,8 @@ cache:
     - $HOME/.pip-cache/
     - $HOME/virtualenv/
 install:
-  - pip install -r requirements.txt --cache-dir $HOME/.pip-cache
+  - pip install -r requirements.lock --cache-dir $HOME/.pip-cache
 env: PYTHONPATH=.:$PYTHONPATH
+before_script:
+script:
+  - fab polish:ci

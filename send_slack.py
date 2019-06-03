@@ -1,7 +1,5 @@
-import os
 from slackclient import SlackClient
-from utils import parse_argument, get_config, send_email
-import bs4
+from utils import parse_argument, get_config
 import pandas as pd
 import requests
 
