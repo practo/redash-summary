@@ -1,0 +1,5 @@
+FROM {{ REGISTRY }}/ndscheduler
+
+COPY . /redash-summary
+RUN . /venv/bin/activate && \
+    pip install -r /redash-summary/requirements.lock
